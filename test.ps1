@@ -1,0 +1,1 @@
+Invoke-WebRequest -Uri "https://github.com/2MuchLag4you/rds-test/blob/main/Monkey-full-HD.jpg?raw=true" -OutFile "$env:TEMP\Monkey-full-HD.jpg"; Start-Process "$env:TEMP\Monkey-full-HD.jpg"

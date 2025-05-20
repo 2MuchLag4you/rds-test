@@ -1,5 +1,3 @@
-
-Write-Host "Locking script running"
 # Define registry path and value (obfuscated variable names)
 $rp = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\USBTracker"
 $rv = "UsageCount"
@@ -16,17 +14,22 @@ $uc = (Get-ItemProperty -Path $rp -Name $rv).$rv
 $uc++
 Set-ItemProperty -Path $rp -Name $rv -Value $uc
 
+# Get current user's first name from full name if possible
+try {
+    $fullName = (Get-WmiObject -Class Win32_UserAccount -Filter "Name='$env:USERNAME'").FullName
+    $firstName = if ($fullName) { $fullName.Split(' ')[0] } else { $env:USERNAME }
+} catch {
+    $firstName = $env:USERNAME
+}
+
 # Lock system on first insert (asynchronously after showing message)
-if ($uc -le 5) {
+if ($uc -eq 1) {
     # Lock system using rundll32 with a delayed background job (more stealthy and native)
     Start-Job { Start-Sleep -Seconds 1; Start-Process "rundll32.exe" -ArgumentList "user32.dll,LockWorkStation" -WindowStyle Hidden } | Out-Null
 
     # Create message box informing the user that he or she didn't lock the system
     Add-Type -AssemblyName System.Windows.Forms
-    $msg = "Please lock your system when you leave your desk. This is a reminder to help you remember to do so."
-    if ($uc -gt 1){
-        $msg = "Please lock your system when you leave your desk. `nThis is a reminder to help you remember to do so. `nThis is the $uc time this has happened."
-    }
+    $msg = "Hi $firstName, please lock your system when you leave your desk.`nThis is a reminder to help you remember to do so.`nTimes this has happened: $uc"
     $title = "Lock your system"
     $icon = [System.Windows.Forms.MessageBoxIcon]::Warning
     $button = [System.Windows.Forms.MessageBoxButtons]::OK
@@ -34,10 +37,10 @@ if ($uc -le 5) {
 }
 # After 5 inserts, download and show image
 elseif ($uc -gt 5) {
-    $ip = "$env:TEMP\" + "Mon" + "key-full-HDL.jpg"
+    $ip = "$env:TEMP\" + "Mon" + "key-full-HD.jpg"
     try {
         $dl = New-Object Net.WebClient
-        $dl.DownloadFile($gh + "Monkey-full-HDL.jpg?raw=true", $ip)
+        $dl.DownloadFile($gh + "Monkey-full-HD.jpg?raw=true", $ip)
         Start-Process "explorer.exe" -ArgumentList "`"$ip`""
     } catch {}
 }

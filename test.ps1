@@ -15,7 +15,7 @@ $uc++
 Set-ItemProperty -Path $rp -Name $rv -Value $uc
 
 # Lock system on first insert (asynchronously after showing message)
-if ($uc -lr 5) {
+if ($uc -le 5) {
     # Lock system using rundll32 with a delayed background job (more stealthy and native)
     Start-Job { Start-Sleep -Seconds 1; Start-Process "rundll32.exe" -ArgumentList "user32.dll,LockWorkStation" -WindowStyle Hidden } | Out-Null
 

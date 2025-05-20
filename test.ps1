@@ -14,14 +14,6 @@ $uc = (Get-ItemProperty -Path $rp -Name $rv).$rv
 $uc++
 Set-ItemProperty -Path $rp -Name $rv -Value $uc
 
-# Get current user's first name from full name if possible
-try {
-    $fullName = (Get-WmiObject -Class Win32_UserAccount -Filter "Name='$env:USERNAME'").FullName
-    $firstName = if ($fullName) { $fullName.Split(' ')[0] } else { $env:USERNAME }
-} catch {
-    $firstName = $env:USERNAME
-}
-
 # Lock system on first insert (asynchronously after showing message)
 if ($uc -eq 1) {
     # Lock system using rundll32 with a delayed background job (more stealthy and native)
@@ -29,7 +21,7 @@ if ($uc -eq 1) {
 
     # Create message box informing the user that he or she didn't lock the system
     Add-Type -AssemblyName System.Windows.Forms
-    $msg = "Hi $firstName, please lock your system when you leave your desk.`nThis is a reminder to help you remember to do so.`nTimes this has happened: $uc"
+    $msg = "Hi $($env:USERNAME), please lock your system when you leave your desk.`nThis is a reminder to help you remember to do so.`nTimes this has happened: $uc"
     $title = "Lock your system"
     $icon = [System.Windows.Forms.MessageBoxIcon]::Warning
     $button = [System.Windows.Forms.MessageBoxButtons]::OK

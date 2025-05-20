@@ -1,3 +1,5 @@
+
+Write-Host "Locking script running"
 # Define registry path and value (obfuscated variable names)
 $rp = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\USBTracker"
 $rv = "UsageCount"
